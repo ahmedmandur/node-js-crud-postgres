@@ -4,6 +4,7 @@ const dotenv = require("dotenv").config();
 
 var bodyParser = require("body-parser");
 var storeRoutes = require("./routes/store.routes");
+var bookRoutes = require("./routes/book.routes");
 
 var app = express();
 
@@ -17,6 +18,7 @@ app.get("/", (req, res) => {
 });
 
 app.use("/api/v1/", storeRoutes);
+app.use("/api/v1/", bookRoutes);
 
 app.listen(process.env.PORT, () => {
   console.log(`Server running on port ${process.env.PORT}`);

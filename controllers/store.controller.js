@@ -2,8 +2,9 @@ var storeModel = require("../models/store.model");
 var storeQueries = require("../db/queries/store.queries");
 var dbConnection = require("../db/connection");
 var helpers = require("../utils/helpers");
+
 exports.getAllStores = (req, res) => {
-  dbConnection.query(storeQueries.queries.GET_STORES_LIST, (err, result) => {
+  dbConnection.dbQuery(storeQueries.queries.GET_LIST, (err, result) => {
     if (err) {
       res.status(500).send({
         message: err.message || "Some error occurred while retrieving stores.",
@@ -30,15 +31,53 @@ exports.saveStore = (req, res) => {
     req.body.address,
   ];
 
-  dbConnection.query(storeQueries.queries.ADD_STORE, values, (err, result) => {
+  dbConnection.dbQuery(storeQueries.queries.ADD, values, (err, result) => {
     if (err) {
       res.status(500).send({
-        message: err.message || "Some error occurred while retrieving stores.",
+        message: err.message || "Some error occurred while adding store.",
       });
     } else {
       res.send(result);
     }
   });
 
-  return res.status(201).send();
+  return res.status(201).send("Store created successfully");
+};
+
+exports.getById = async (req, res) => {
+  var result = await dbConnection.dbQuery(storeQueries.queries.GET_BY_ID, [
+    req.params.id,
+  ]);
+  return res.status(200).send(result.rows);
+};
+
+exports.updateStore = (req, res) => {
+  values = [req.body.name, req.body.address, req.params.id];
+  dbConnection.dbQuery(storeQueries.queries.UPDATE, values, (err, result) => {
+    if (err) {
+      res.status(500).send({
+        message: err.message || "Some error occurred while updating store.",
+      });
+    } else {
+      res.send(result.rows);
+    }
+  });
+
+  return res.status(200).send("Store updated successfully");
+};
+
+exports.deleteStore = (req, res) => {
+  dbConnection.dbQuery(
+    storeQueries.queries.DELETE,
+    [req.params.id],
+    (err, result) => {
+      if (err) {
+        res.status(500).send({
+          message: err.message || "Some error occurred while deleting stores.",
+        });
+      } else {
+        res.send(result);
+      }
+    }
+  );
 };
