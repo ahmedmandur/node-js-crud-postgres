@@ -1,9 +1,23 @@
 var bookQueries = require("../db/queries/book.queries");
 var dbConnection = require("../db/connection");
+var Logger = require("../services/logger.service");
+var audit = require("../services/audit.service");
 var helpers = require("../utils/helpers");
+
+const { AuditActions } = require("../constants/auditActions");
+
+const logger = new Logger("book.controller");
 
 exports.getAllBooks = async (req, res) => {
   var result = await dbConnection.dbQuery(bookQueries.queries.GET_LIST);
+  await logger.info("getAllBooks", result.rows);
+  audit.prepareAudit(
+    AuditActions.GET_BOOK_LIST,
+    result.rows,
+    null,
+    "POSTMAN",
+    helpers.formattedDate()
+  );
   return res.status(200).send(result.rows);
 };
 
@@ -26,6 +40,14 @@ exports.saveBook = async (req, res) => {
     createdBy,
   ];
 
+  audit.prepareAudit(
+    AuditActions.SAVE_BOOK,
+    values,
+    null,
+    createdBy,
+    createdOn
+  );
+
   await dbConnection.dbQuery(bookQueries.queries.ADD, values);
   return res.status(201).send("Book created successfully");
 };
@@ -47,6 +69,14 @@ exports.updateBook = async (req, res) => {
 
   values = [req.body.title, req.body.description, req.params.id];
 
+  audit.prepareAudit(
+    AuditActions.UPDATE_BOOK,
+    values,
+    null,
+    createdBy,
+    createdOn
+  );
+
   await dbConnection.dbQuery(bookQueries.queries.UPDATE, values);
   return res.status(200).send("Book updated successfully");
 };
@@ -56,6 +86,14 @@ exports.deleteBook = async (req, res) => {
   if (result.rows.length == 0) {
     return res.status(404).send("Book not found");
   }
+  audit.prepareAudit(
+    AuditActions.DELETE_BOOK,
+    req.params.id,
+    null,
+    createdBy,
+    createdOn
+  );
+
   await dbConnection.dbQuery(bookQueries.queries.DELETE, [req.params.id]);
   return res.status(200).send("Book deleted successfully");
 };

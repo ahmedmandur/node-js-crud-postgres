@@ -5,3 +5,5 @@ exports.randomString = () =>
     charset: "alphanumeric",
     capitalization: true,
   });
+
+exports.formattedDate = () => new Date().toLocaleString();

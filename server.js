@@ -1,10 +1,12 @@
-var express = require("express");
-var cors = require("cors");
+const express = require("express");
+const cors = require("cors");
 const dotenv = require("dotenv").config();
+const swaggerUi = require("swagger-ui-express");
+const swaggerDocument = require("./swagger.json");
 
-var bodyParser = require("body-parser");
-var storeRoutes = require("./routes/store.routes");
-var bookRoutes = require("./routes/book.routes");
+const bodyParser = require("body-parser");
+const storeRoutes = require("./routes/store.routes");
+const bookRoutes = require("./routes/book.routes");
 
 var app = express();
 
@@ -19,6 +21,12 @@ app.get("/", (req, res) => {
 
 app.use("/api/v1/", storeRoutes);
 app.use("/api/v1/", bookRoutes);
+
+app.use(
+  "/api-docs",
+  swaggerUi.serve,
+  swaggerUi.setup(swaggerDocument, { explorer: true })
+);
 
 app.listen(process.env.PORT, () => {
   console.log(`Server running on port ${process.env.PORT}`);
