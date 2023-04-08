@@ -2,38 +2,53 @@
   "swagger": "2.0",
   "info": {
     "version": "1.0.0",
-    "title": "Book Store API",
-    "description": "Book Store API",
-    "license": {
-      "name": "MIT",
-      "url": "https://opensource.org/licenses/MIT"
-    }
+    "title": "Note & Books API",
+    "description": "Note & Books API"
   },
   "host": "localhost:3000",
   "basePath": "/",
-  "tags": [
-    {
-      "name": "Book Store",
-      "description": "API"
-    }
-  ],
   "schemes": ["http"],
   "consumes": ["application/json"],
   "produces": ["application/json"],
   "paths": {
     "/api/v1/books": {
       "get": {
-        "description": "Returns all BOOKS from the system that the user has access to",
+        "description": "Returns all Books from the system that the user has access to",
         "produces": ["application/json"],
+        "tags": ["Books"],
         "responses": {
           "200": {
             "description": "A list of books.",
             "schema": {
               "type": "array",
               "items": {
-                "$ref": "#/definitions/books"
+                "$ref": "#/definitions/book"
               }
             }
+          }
+        }
+      },
+      "post": {
+        "description": "Post book to the book store",
+        "produces": ["application/json"],
+        "tags": ["Books"],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "description": "book object that needs to be added to the store",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/book"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "A book created successfully."
+          },
+          "400": {
+            "description": "Bad request, the title and store code is required."
           }
         }
       }
@@ -41,15 +56,13 @@
   },
   "definitions": {
     "book": {
-      "required": ["title", "publisher", "author"],
       "properties": {
-        "bookId": {
+        "id": {
           "type": "integer"
         },
         "title": {
           "type": "string"
         },
-
         "description": {
           "type": "string"
         },
@@ -61,11 +74,11 @@
         },
         "pages": {
           "type": "integer"
+        },
+        "store_code": {
+          "type": "string"
         }
       }
-    },
-    "books": {
-      "$ref": "#/definitions/book"
     }
   }
 }

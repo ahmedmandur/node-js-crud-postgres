@@ -25,11 +25,10 @@ exports.saveBook = async (req, res) => {
   if (!req.body.title || !req.body.store_code) {
     return res.status(400).send("Please provide all required fields");
   }
-
   var createdBy = "admin";
   var createdOn = new Date();
 
-  values = [
+  dbValues = [
     req.body.title,
     req.body.description,
     req.body.author,
@@ -39,16 +38,14 @@ exports.saveBook = async (req, res) => {
     createdOn,
     createdBy,
   ];
-
   audit.prepareAudit(
     AuditActions.SAVE_BOOK,
-    values,
     null,
-    createdBy,
-    createdOn
+    null,
+    "POSTMAN",
+    helpers.formattedDate()
   );
-
-  await dbConnection.dbQuery(bookQueries.queries.ADD, values);
+  await dbConnection.dbQuery(bookQueries.queries.ADD, dbValues);
   return res.status(201).send("Book created successfully");
 };
 
@@ -67,17 +64,17 @@ exports.updateBook = async (req, res) => {
     return res.status(404).send("Book not found");
   }
 
-  values = [req.body.title, req.body.description, req.params.id];
+  dbValues = [req.body.title, req.body.description, req.params.id];
 
   audit.prepareAudit(
-    AuditActions.UPDATE_BOOK,
-    values,
+    AuditActions.GET_BOOK_LIST,
     null,
-    createdBy,
-    createdOn
+    null,
+    "POSTMAN",
+    helpers.formattedDate()
   );
 
-  await dbConnection.dbQuery(bookQueries.queries.UPDATE, values);
+  await dbConnection.dbQuery(bookQueries.queries.UPDATE, dbValues);
   return res.status(200).send("Book updated successfully");
 };
 

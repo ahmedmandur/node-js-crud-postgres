@@ -10,16 +10,13 @@ emitter.on(auditEvent, function (audit) {
   try {
     values = [
       audit.auditAction,
-      JSON.stringify(audit.data),
+      audit.data == null ? null : JSON.stringify(audit.data),
       audit.auditBy,
       audit.auditOn,
       audit.status,
       audit.error,
     ];
     var auditQuery = auditQueries.queries.ADD;
-
-    console.log(auditQuery);
-    console.log(values);
 
     dbConnection.dbQuery(auditQuery, values);
   } catch (error) {
